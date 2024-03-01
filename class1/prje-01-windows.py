@@ -3,9 +3,9 @@ import pygame
 import sys
 import math
 ###################初始化###################
-pygame.init()
-width = 500
-height= 500
+pygame.init()# 啟動 Pygame
+width = 500# 設定視窗寬度 
+height= 500# 設定視窗高度
 ###################建立視窗及物件###################
 #設定窗大小
 s=pygame.display.set_mode((width,height))
@@ -16,10 +16,12 @@ bg.fill((255,255,255))
 ###################循環偵測###################
 while True:
     for event in pygame.event.get():
-        if event.type ==pygame.QUIT:
-            sys.exit()
+        if event.type ==pygame.QUIT:# 如果按下 [X] 就退出
+            sys.exit()# 離開遊戲
 
-    s.blit(bg,(0,0))
+    # 繪製畫布於視窗左上角
+    s.blit(bg, (0, 0))
+    # 更新視窗
     pygame.display.update()
     ###################繪製圖形###################
     pygame.draw.circle(bg, (255,0,250),(70,100),30,0)
@@ -47,4 +49,4 @@ while True:
     x,y=pygame.mouse.get_pos()
     if event.type == pygame.MOUSEBUTTONDOWN:
         print("click!")
-        print(pygame.mouse.get_pos())
+        print(pygame.mouse.get_pos())# 取得滑鼠座標
