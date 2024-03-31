@@ -25,20 +25,24 @@ def check_click(pos,x_min,y_min,x_max,y_max):
     else:
         return False
 def times_update():
-    times_sur=times_font.render(str(times),True,red)
-    screen.blit(times_sur,(bg_x-times_sur.get_width()-10,10))
+    """更新次數"""
+    times_sur = times_font.render(str(times), True, red)  # 次數文字渲染
+    # 將次數文字貼到視窗的右上角
+    screen.blit(times_sur, (bg_x - times_sur.get_width() - 10, 10)) 
 def game_over():
+    """遊戲結束"""
     screen.fill(black)
-    end_sur=score_font.render(f"Your score is :{score}",False,red)
-    screen.blit(end_sur,(bg_x/2-end_sur.get_width()/2,bg_y/2-end_sur.get_height()/2))
+    end_sur = score_font.render(f"Game Over~ Your Score is:{score}", False, red)
+    screen.blit(end_sur, (bg_x / 2 - end_sur.get_width() / 2, bg_y / 2 - end_sur.get_height() / 2))
 def mouse_update():
-    global hammer,hammer_tick
-    if hammer==ham1:
-        hammer=ham2
-        hammer_tick=0
-    else:
-        hammer_tick += 1
-    screen.blit(hammer,(mouse_pos[0]-15,mouse_pos[1]-15))
+    global hammer, hammer_tick
+    if hammer == ham1:
+        if hammer_tick > hammer_max_tick:
+            hammer = ham2
+            hammer_tick = 0
+        else:
+            hammer_tick += 1
+# 讓鎚子的中心點在滑鼠的位置screen.blit(hammer, (mouse_pos[0] - 15, mouse_pos[1] - 15)) 
 ####################初始化######################
 os.chdir(sys.path[0])
 pygame.init()
@@ -61,10 +65,10 @@ pygame.display.set_caption("打地鼠")
 ######################背景物件######################
 # 將背景填滿黑色
 ######################次數物件######################
-times=0
-times_max=5
-typeface=pygame.font.get_default_font()
-times_font=pygame.font.Font(typeface,24)
+times = 0 # 次數計數
+times_max = 5 # 地鼠出現最大次數
+typeface = pygame.font.get_default_font()
+times_font = pygame.font.Font(typeface, 24)
 ######################地鼠物件######################
 pos6 = [[195,305],[400,305],[610,305],[195,450],[400,450],[610,450]]
 # pos6 = [[200,200],[300,200],[400,200],[200,300],[300,300],[400,300]]
@@ -77,11 +81,11 @@ typeface=pygame.font.get_default_font()
 score_font=pygame.font.Font(typeface,24)
 ######################滑鼠物件######################
 pygame.mouse.set_visible(False)
-# ham1=pygame.image.load("Hammer1.png")
-# ham2=pygame.image.load("Hammer2.png")
-# hammer=ham2
-# hammer_tick=0
-# hammer_max_tick=5
+ham1 = pygame.image.load("Hammer1.png")  # 鎚子圖片
+ham2 = pygame.image.load("Hammer2.png")  # 鎚子圖片
+hammer = ham2  # 設定目前要顯示的鎚子圖片
+hammer_tick = 0 # 計數器目前值
+hammer_max_tick = 5 # 設定計數器最大值
 ######################循環偵測######################
 while True:
     clock.tick(30)
@@ -93,12 +97,15 @@ while True:
             if check_click(mouse_pos,pos[0]-50,pos[1]-50,pos[0]+50,pos[1]+50):
                 tick=max_tick+1
                 score+=1
-    if times>=times_max:
-        game_over()
+                hammer = ham1
+    if times >= times_max:  # 次數用完
+        game_over()  # 遊戲結束
     else:
         screen.blit(bg,(0,0))
         gophers_update()
         pygame.draw.circle(screen,red,mouse_pos,10)
         score_update()
         times_update()
+        mouse_update()  # 更新滑鼠
     pygame.display.update()
+    
