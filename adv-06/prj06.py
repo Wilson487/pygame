@@ -4,16 +4,30 @@ import sys
 import os
 import random
 ####################定義函式######################
+def tick_undate(tick:dict[str,int],max_tick):
+    if tick["tick"]>max_tick:
+        tick["tick"]=0
+        reset=True
+    else:
+        tick["tick"]+=1
+        reset=False
+    return reset
 def gophers_update():
-    global tick,pos,score,times#使用全域變數
-    if tick>max_tick:
+    global tick,pos,score,times,gophers_tick,hitsur#使用全域變數
+    if tick["tick"]>max_tick:
         new_pos=random.randint(0,5)
         pos=pos6[new_pos]
-        tick=0
+        tick["tick"]=0
         times+=1#次數加一
     else:
-        tick+=1
-    screen.blit(gopher,(pos[0]-gopher.get_width()/2,pos[1]-gopher.get_height()/2))
+        tick["tick"]+=1
+    if hitsur==gophers2:
+        if gophers_tick["tick"]>gophers_max_tick:
+            hitsur=gophers
+            gophers_tick["tick"]=0
+        else:
+            gophers_tick["tick"]+=1
+    screen.blit(hitsur,(pos[0]-gopher.get_width()/2,pos[1]-gopher.get_height()/2))
 def score_update():
     score_sur=score_font.render(str(score),False,red)
     screen.blit(score_sur,(10,10))
@@ -37,11 +51,11 @@ def game_over():
 def mouse_update():
     global hammer, hammer_tick
     if hammer == ham1:
-        if hammer_tick > hammer_max_tick:
+        if hammer_tick["tick"] > hammer_max_tick:
             hammer = ham2
-            hammer_tick = 0
+            hammer_tick["tick"] = 0
         else:
-            hammer_tick += 1
+            hammer_tick["tick"] += 1
 # 讓鎚子的中心點在滑鼠的位置
     screen.blit(hammer, (mouse_pos[0] - 15, mouse_pos[1] - 15))
 ####################初始化######################
@@ -52,7 +66,7 @@ white=(255,255,255)
 black = (0,0,0)
 red = (255,0,0)
 clock = pygame.time.Clock()
-tick = 0
+tick = {"tick":0}
 max_tick = 20
 bg_img='Gophers_BG_800x600.png'
 bg=pygame.image.load(bg_img)
@@ -70,12 +84,18 @@ times=0#次數計數
 times_max=5#地鼠出現最大次數
 typeface=pygame.font.get_default_font()
 times_font=pygame.font.Font(typeface,24)
+######################聲音物件######################
+pygame.mixer.music.load("hit.mp3")
 ######################地鼠物件######################
 pos6 = [[195,305],[400,305],[610,305],[195,450],[400,450],[610,450]]
 # pos6 = [[200,200],[300,200],[400,200],[200,300],[300,300],[400,300]]
 pos = pos6[0] # 外圍記錄圓的位子
 gopher = pygame.image.load("Gophers150.png") # 地鼠圖片
-gophers=pygame.image.load('Gophers_BG_800x600.png')
+gophers=pygame.image.load('Gophers150.png')
+gophers2=pygame.image.load("大熊.jpg")#地鼠圖片
+hitsur=gophers# 設定目前要顯示的地鼠圖片
+gophers_tick={"tick":0} #計數器目前值
+gophers_max_tick=5 # 設定計數器最大值
 ######################分數物件######################
 score=0
 typeface=pygame.font.get_default_font()
@@ -85,7 +105,7 @@ pygame.mouse.set_visible(False)
 ham1 = pygame.image.load("Hammer1.png")  # 鎚子圖片
 ham2 = pygame.image.load("Hammer2.png")  # 鎚子圖片
 hammer = ham2  # 設定目前要顯示的鎚子圖片
-hammer_tick = 0 # 計數器目前值
+hammer_tick = {"tick":0} # 計數器目前值
 hammer_max_tick = 5 # 設定計數器最大值
 ######################循環偵測######################
 while True:
@@ -97,14 +117,16 @@ while True:
         if event.type==pygame.MOUSEBUTTONDOWN:
             hammer=ham1
             if check_click(mouse_pos,pos[0]-50,pos[1]-50,pos[0]+50,pos[1]+50):
-                tick=max_tick+1
+                tick["tick"]=max_tick+1
                 score+=1
+                hitsur=gophers2
+                pygame.mixer.music.play()
     if times>=times_max:
         game_over()
     else:
         screen.blit(bg,(0,0))
         gophers_update()
-        pygame.draw.circle(screen,blue,mouse_pos,10)
+        # pygame.draw.circle(screen,blue,mouse_pos,10)
         score_update()
         pygame.display.update()
         times_update()
